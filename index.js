@@ -33,10 +33,15 @@ function generateShoppingItemsString(shoppingList) {
 }
 
 
-function renderShoppingList() {
+
+function renderShoppingList(filter) {
   // Make a copy of STORE.items to manipulate for displaying
   let filteredItems = [ ...STORE.items ];
-  
+  //console.log(filteredItems);
+  if (filter) {
+    filteredItems = filteredItems.filter((item) => item.checked === false);
+  } 
+  console.log(filteredItems);
   // Check STORE.sortBy to determine how to order filteredItems
   if (STORE.sortBy === 'alpha') {
     filteredItems.sort((a, b) => a.name > b.name);
@@ -93,7 +98,6 @@ function handleItemCheckClicked() {
   });
 }
 
-// name says it all. responsible for deleting a list item.
 function deleteListItem(itemId) {
   const itemIndex = STORE.items.findIndex(i => i.id === itemId);
   STORE.items.splice(itemIndex, 1);
@@ -101,12 +105,9 @@ function deleteListItem(itemId) {
 
 
 function handleDeleteItemClicked() {
-  // like in `handleItemCheckClicked`, we use event delegation
   $('.js-shopping-list').on('click', '.js-item-delete', event => {
     const itemId = getItemIdFromElement(event.currentTarget);
-    // delete the item
     deleteListItem(itemId);
-    // render the updated shopping list
     renderShoppingList();
   });
 }
@@ -123,17 +124,25 @@ function handleChangeSortBy() {
   });
 }
 
-// this function will be our callback when the page loads. it's responsible for
-// initially rendering the shopping list, and activating our individual functions
-// that handle new item submission and user clicks on the "check" and "delete" buttons
-// for individual shopping list items.
+function handleCheckboxClicked() {
+  $('input[name=showHide-checkBox]').change(event => {
+    if($(event.currentTarget).is(':checked')) {
+      //console.log('Box Is Checked');
+      renderShoppingList('filter');
+    } else {
+      //console.log('Box is Unchecked');
+      renderShoppingList();
+    }
+  });
+}
+
 function handleShoppingList() {
   renderShoppingList();
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleChangeSortBy();
+  handleCheckboxClicked();
 }
 
-// when the page loads, call `handleShoppingList`
 $(handleShoppingList);
