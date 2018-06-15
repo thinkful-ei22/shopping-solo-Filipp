@@ -21,6 +21,16 @@ function generateItemElement(item) {
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
         </button>
+        
+        <form id="js-edit-button-form">
+        <label for="edit-button">Edit the Item</label>
+        <input type="text" name="edit-button" class="js-edit-button" placeholder="${item.name}">
+        <button class="shopping-item-edit js-item-edit">
+            <span class="button-label">edit</span>
+        </button>
+
+      </form>
+        
       </div>
     </li>`;
 }
@@ -34,26 +44,26 @@ function generateShoppingItemsString(shoppingList) {
 
 
 
-function renderShoppingList(filter) {
-  // Make a copy of STORE.items to manipulate for displaying
+function renderShoppingList(filter, inputValue) {
   let filteredItems = [ ...STORE.items ];
   //console.log(filteredItems);
-  if (filter) {
+  if (filter === 'checkboxFilter') {
     filteredItems = filteredItems.filter((item) => item.checked === false);
   } 
-  console.log(filteredItems);
-  // Check STORE.sortBy to determine how to order filteredItems
+  //console.log(filteredItems);
+  if (filter === 'buttonFilter') {
+    filteredItems = filteredItems.filter((item) => item.name.includes(inputValue) === true);
+  }
+
+
   if (STORE.sortBy === 'alpha') {
     filteredItems.sort((a, b) => a.name > b.name);
   } else if (STORE.sortBy === 'time') {
     filteredItems.sort((a, b) => a.createdAt < b.createdAt);
   }
   
-  // render the shopping list in the DOM
   console.log('`renderShoppingList` ran');
-  // We're now generating HTML from the filteredItems and not the persistent STORE.items
   const shoppingListItemsString = generateShoppingItemsString(filteredItems);
-  // insert that HTML into the DOM
   $('.js-shopping-list').html(shoppingListItemsString);
 }
 
@@ -127,13 +137,52 @@ function handleChangeSortBy() {
 function handleCheckboxClicked() {
   $('input[name=showHide-checkBox]').change(event => {
     if($(event.currentTarget).is(':checked')) {
-      //console.log('Box Is Checked');
-      renderShoppingList('filter');
+      console.log('Box Is Checked');
+      renderShoppingList('checkboxFilter');
     } else {
-      //console.log('Box is Unchecked');
+      console.log('Box is Unchecked');
       renderShoppingList();
     }
   });
+}
+
+function handleFilterButtonClicked() {
+  $('#js-shopping-list-filter').submit(function(event) {
+    event.preventDefault();
+    console.log('filterButton Clicked');
+    const filterName = $('.js-filter-entry').val();
+    $('.js-filter-entry').val('');
+    renderShoppingList('buttonFilter', filterName);
+  });
+}
+
+
+
+
+function handleEditButtonClicked() {
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    event.preventDefault();
+    //console.log('edit Button Clicked');
+    
+    const editValue = $(event.currentTarget).closest('form').find('input[name=edit-button]').val();
+    $('.js-edit-button').val('');
+    //console.log(editValue);
+    
+    const itemId = getItemIdFromElement(event.currentTarget);
+    //console.log(itemId);
+    
+    editListItem(itemId, editValue);
+    
+    renderShoppingList();
+  });
+}
+
+function editListItem(itemId, editValue) {
+  //console.log(itemId, editValue);
+  
+  const item = findItemById(itemId);
+  //console.log(item);
+  item.name = editValue;
 }
 
 function handleShoppingList() {
@@ -143,6 +192,8 @@ function handleShoppingList() {
   handleDeleteItemClicked();
   handleChangeSortBy();
   handleCheckboxClicked();
+  handleFilterButtonClicked();
+  handleEditButtonClicked();
 }
 
 $(handleShoppingList);

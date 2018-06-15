@@ -13,11 +13,16 @@
     <h1>Shopping List</h1>
     <div>
       <form id="js-shopping-list-form">
-        <label for="shopping-list-entry">Add an item</label>
+        <label for="shopping-list-entry">Add an Item</label>
         <input type="text" name="shopping-list-entry" class="js-shopping-list-entry" placeholder="e.g., broccoli">
-        <button type="submit">Add item</button>
+        <button id="Add-item-button" type="submit">Add item</button>
         <input id="showHide-checkBox" type="checkbox" name="showHide-checkBox">
         <label for="showHide-checkBox">Hide/Show checked items.</label>
+      </form>
+      <form id="js-shopping-list-filter">
+        <label for="filter-entry">Filter the list</label>
+        <input type="text" name="filter-entry" class="js-filter-entry" placeholder="e.g., broccoli">
+        <button id="Add-item-button" type="submit">Filter Items</button>
       </form>
     </div>
     <ul class="shopping-list js-shopping-list">
